@@ -15,7 +15,19 @@ the Supporting Information of the Iwata et al. reference: [https://doi.org/10.10
 
 ## 1. Set environment
 
-[TODO]
+| | |
+|---|---|
+| Python | 3.10 |
+| PyTorch | 1.13.1 (CUDA 11.7) |
+| PyTorch Lightning | 2.0.3 |
+
+```bash
+conda create -n TriSPD python=3.10 -y
+conda activate TriSPD
+
+pip install torch==1.13.1 --index-url https://download.pytorch.org/whl/cu117
+pip install -r requirements.txt
+```
 
 ## 2. Preparing the pre-training data
 
@@ -49,8 +61,8 @@ rank, CKA, distance-modality coverage, and layer-wise cross-model CKA.
 ```bash
 python run_bivstri.py \
     --num_samples 100 --val_lmdb src/Pretrain/test_sample.lmdb \
-    --bi_ckpt  Pretrain/bi_random/bimodal_pubchem100m_96_step=216260.ckpt \
-    --tri_ckpt Pretrain/tri_random/trimodal_pubchem100m_96_step=216260.ckpt
+    --bi_ckpt  checkpoints/bimodal_pubchem100m_96_step=216260.ckpt \
+    --tri_ckpt checkpoints/trimodal_pubchem100m_96_step=216260.ckpt
 ```
 
 ## 5. Zero-shot tasks
@@ -60,7 +72,7 @@ python run_bivstri.py \
 ```bash
 python pv_predict.py \
     --input_file src/Pretrain/test_sample.lmdb \
-    --checkpoint Pretrain/tri_random/trimodal_pubchem100m_96_step=216260.ckpt
+    --checkpoint checkpoints/trimodal_pubchem100m_96_step=216260.ckpt
 ```
 
 **SMILES generation**
@@ -68,7 +80,7 @@ python pv_predict.py \
 ```bash
 python gen_smiles.py \
     --k_list 5,10 --n_mols 1000 --test_file src/Pretrain/test_sample.txt --batch_size 512 \
-    --checkpoint Pretrain/tri_random/trimodal_pubchem100m_96_step=216260.ckpt \
+    --checkpoint checkpoints/trimodal_pubchem100m_96_step=216260.ckpt \
     --out_csv ./gensmiles_tri.csv
 ```
 
@@ -85,8 +97,8 @@ one file per (checkpoint, target, split).
 
 ```bash
 python ft_extract_feature.py \
-    --checkpoints Pretrain/trimodal_pubchem100m_96_step=216260.ckpt \
-                  Pretrain/trimodal_pubchem100m_96_step=173008.ckpt \
+    --checkpoints checkpoints/trimodal_pubchem100m_96_step=216260.ckpt \
+                  checkpoints/trimodal_pubchem100m_96_step=173008.ckpt \
     --target_name human_CL --input src/Finetuning/test_sample_pk.csv
 ```
 
@@ -98,8 +110,8 @@ Trains an endpoint predictor on the cached frozen features.
 python ft_regression.py \
     --target_name human_CL --input src/Finetuning/test_sample_pk.csv \
     --warmup_mode gradual --num_seeds 100 \
-    --checkpoints Pretrain/trimodal_pubchem100m_96_step=173008.ckpt \
-                  Pretrain/trimodal_pubchem100m_96_step=216260.ckpt \
+    --checkpoints checkpoints/trimodal_pubchem100m_96_step=173008.ckpt \
+                  checkpoints/trimodal_pubchem100m_96_step=216260.ckpt \
     --tag tri --ratios 0 0.25 0.5 0.75 1.0
 ```
 
