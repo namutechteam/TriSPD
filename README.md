@@ -17,7 +17,7 @@ the Supporting Information of the Iwata et al. reference: [https://doi.org/10.10
 
 | | |
 |---|---|
-| Python | 3.10 |
+| Python | >3.10 |
 | PyTorch | 1.13.1 (CUDA 11.7) |
 | PyTorch Lightning | 2.0.3 |
 
@@ -48,7 +48,7 @@ the DOI above.
 Train the trimodal model on the LMDB produced in the previous step.
 
 ```bash
-python SPMM_pretrain_tri.py \
+python pretrain_TriSPD.py \
     --batch_size 96 --num_workers 8 --devices 5 \
     --input_file src/Pretrain/test_sample.lmdb
 ```
